@@ -1,0 +1,1 @@
+setTimeout(()=>{document.querySelectorAll('.alert').forEach(x=>{x.style.transition='opacity .5s';x.style.opacity='0';setTimeout(()=>x.remove(),500)})},4000);

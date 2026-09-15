@@ -1,0 +1,6 @@
+<?php
+require "config.php"; admin_required(); $title="Master Data Presensi";
+if($_SERVER['REQUEST_METHOD']==='POST'){ $id=(int)$_POST['id'];$nama=trim($_POST['nama_status']);$warna=trim($_POST['warna']);$s=$conn->prepare("UPDATE status_presensi SET nama_status=?,warna=? WHERE id=?");$s->bind_param("ssi",$nama,$warna,$id);$s->execute();flash('success','Status diperbarui.');header("Location:master_status.php");exit;}
+$rows=$conn->query("SELECT * FROM status_presensi ORDER BY id");include "header.php";?>
+<h2>Master Data Presensi</h2><p class="muted">Status bawaan: Hadir, Sakit, Izin, Alpa.</p><div class="card table-wrap"><table><tr><th>Kode</th><th>Status</th><th>Warna</th><th>Aksi</th></tr><?php while($r=$rows->fetch_assoc()):?><tr><td><?=e($r['kode'])?></td><td><span class="badge" style="background:<?=e($r['warna'])?>20;color:<?=e($r['warna'])?>"><?=e($r['nama_status'])?></span></td><td><?=e($r['warna'])?></td><td><form method="post" class="filters"><input type="hidden" name="id" value="<?=$r['id']?>"><input name="nama_status" value="<?=e($r['nama_status'])?>" style="max-width:180px"><input type="color" name="warna" value="<?=e($r['warna'])?>" style="width:60px"><button class="btn">Simpan</button></form></td></tr><?php endwhile;?></table></div>
+<?php include "footer.php"; ?>
