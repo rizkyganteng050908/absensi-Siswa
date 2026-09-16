@@ -1,9 +1,0 @@
-<?php
-require "config.php"; login_required(); $title="Riwayat Presensi";
-$siswa_id=(int)($_GET['siswa_id']??0);$dari=$_GET['dari']??date('Y-m-01');$sampai=$_GET['sampai']??date('Y-m-d');
-$where="p.tanggal BETWEEN '".$conn->real_escape_string($dari)."' AND '".$conn->real_escape_string($sampai)."'";if($siswa_id)$where.=" AND p.siswa_id=$siswa_id";
-$rows=$conn->query("SELECT p.*,s.nis,s.nama,k.nama_kelas,sp.nama_status,sp.warna FROM presensi p JOIN siswa s ON s.id=p.siswa_id JOIN kelas k ON k.id=s.kelas_id JOIN status_presensi sp ON sp.id=p.status_id WHERE $where ORDER BY p.tanggal DESC,s.nama,p.jam_pelajaran");
-$students=$conn->query("SELECT id,nis,nama FROM siswa ORDER BY nama");include "header.php";?>
-<h2>Riwayat Presensi Siswa</h2><div class="card"><form class="filters"><div><label>Siswa</label><select name="siswa_id"><option value="0">Semua siswa</option><?php while($s=$students->fetch_assoc()):?><option value="<?=$s['id']?>" <?=$siswa_id==$s['id']?'selected':''?>><?=e($s['nis'].' - '.$s['nama'])?></option><?php endwhile;?></select></div><div><label>Dari</label><input type="date" name="dari" value="<?=e($dari)?>"></div><div><label>Sampai</label><input type="date" name="sampai" value="<?=e($sampai)?>"></div><div class="small"><button class="btn">Filter</button></div></form></div>
-<div class="card section table-wrap"><table><tr><th>Tanggal</th><th>NIS</th><th>Nama</th><th>Kelas</th><th>Jam</th><th>Status</th><th>Keterangan</th></tr><?php while($r=$rows->fetch_assoc()):?><tr><td><?=e($r['tanggal'])?></td><td><?=e($r['nis'])?></td><td><?=e($r['nama'])?></td><td><?=e($r['nama_kelas'])?></td><td><?=e($r['jam_pelajaran'])?></td><td><span class="badge" style="background:<?=e($r['warna'])?>20;color:<?=e($r['warna'])?>"><?=e($r['nama_status'])?></span></td><td><?=e($r['keterangan'])?></td></tr><?php endwhile;?></table></div>
-<?php include "footer.php"; ?>
