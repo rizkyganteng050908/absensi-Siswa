@@ -1,0 +1,8 @@
+import { sql } from "../../lib/db";
+import { requireAdmin } from "../../lib/auth";
+import { redirect } from "next/navigation";
+import { Shell } from "../dashboard/page";
+
+async function save(formData){ "use server"; const id=Number(formData.get("id")||0), nama=String(formData.get("nama_kelas")), wali=String(formData.get("wali_kelas")||""); if(id) await sql`UPDATE kelas SET nama_kelas=${nama},wali_kelas=${wali} WHERE id=${id}`; else await sql`INSERT INTO kelas(nama_kelas,wali_kelas) VALUES(${nama},${wali})`; redirect("/kelas");}
+async function del(formData){ "use server"; const id=Number(formData.get("id")); await sql`DELETE FROM kelas WHERE id=${id}`; redirect("/kelas");}
+export default async function Kelas(){const user=await requireAdmin();if(!user)redirect("/dashboard");const rows=await sql`SELECT k.*,COUNT(s.id)::int jumlah FROM kelas k LEFT JOIN siswa s ON s.kelas_id=k.id GROUP BY k.id ORDER BY k.nama_kelas`;return <Shell user={user}><h2>Kelola Data Kelas</h2><div className="card"><form action={save}><div className="formgrid"><div><label>Nama Kelas</label><input name="nama_kelas" required/></div><div><label>Wali Kelas</label><input name="wali_kelas"/></div></div><br/><button className="btn">Tambah Kelas</button></form></div><div className="card section tablewrap"><table><thead><tr><th>Kelas</th><th>Wali</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>{rows.map(r=><tr key={r.id}><td>{r.nama_kelas}</td><td>{r.wali_kelas}</td><td>{r.jumlah}</td><td><form action={del}><input type="hidden" name="id" value={r.id}/><button className="btn red">Hapus</button></form></td></tr>)}</tbody></table></div></Shell>}
